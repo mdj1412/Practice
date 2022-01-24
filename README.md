@@ -114,7 +114,7 @@ memset()으로 정수 배열에 0 혹은 -1을 채울 수 있는 이유느 각 �
 
 - 결론 : (존재하는 부분 문제의 수) X (한 부분 문제를 풀 때 필요한 반복문의 수행 횟수) <br>
 - 뒤에 예제에서 적용해보겠습니다.
-
+<br><br>
 
 
 ## 탑다운(Top-Down) vs 바텀업(Bottom-Up)
@@ -131,7 +131,7 @@ DP 문제를 푸는 방법은 탑다운(Top-Down)과 바텀업(Bottom-Up)이 있
     - 점화식을 이용하면 이해하기 쉬게 풀 수 있는 장점이 있다.
 
 
-예시) 이항 계수(binomial coefficient)의 계산
+    예시) 이항 계수(binomial coefficient)의 계산
 <br><br>
 
 <p align="center">
@@ -157,6 +157,7 @@ int bino2(int n, int r) {
     return cache[n][r] = bino2(n-1, r-1) + bino2(n-1, r);
 }
 ```
+<br><br>
 
 - 바텀업(Bottom-Up)
     - 가장 작은 문제들부터 답을 구해가며 전체 문제의 답을 찾는 방식
@@ -184,10 +185,12 @@ int main(void) {
     return 0;
 }
 ```
-<br><br>
+
 
 ### 시간 복잡도 분석
 
+시간 복잡도 = (존재하는 부분 문제의 수) X (한 부분 문제를 풀 때 필요한 반복문의 수행 횟수) 
+<br>
 r의 최대치는 n이고  <img src="https://latex.codecogs.com/svg.image?bino2(n,&space;r)\\" title="bino2(n, r)" /> 을 계산하는데 만날 수 있는 부분 문제의 수는 최대 <img src="https://latex.codecogs.com/svg.image?O(n^2)\\" title="O(n^2)" /> 이다. <br>
 각 부분 문제를 계산할 때 걸리는 시간은 반복문이 없으니 <img src="https://latex.codecogs.com/svg.image?O(1)\\" title="O(1)" /> 이고, <br>
 그러면 위 식에 따라  <img src="https://latex.codecogs.com/svg.image?bino2(n,&space;r)\\" title="bino2(n, r)" /> 을 계산하는데 걸리는 시간 복잡도는 <img src="https://latex.codecogs.com/svg.image?O(n^2)\\" title="O(n^2)" /> 이 된다.
