@@ -158,6 +158,8 @@ int bino2(int n, int r) {
     return cache[n][r] = bino2(n-1, r-1) + bino2(n-1, r);
 }
 ```
+
+- 결과적으로 두 번 이상 반복 계산되는 부분 문제들의 답을 미리 저장함으로써 속도의 향상 -> 동적 계획법
 <br><br>
 
 - 바텀업(Bottom-Up)
@@ -546,8 +548,7 @@ int main(void) {
     path1(y, x, sum) = 현재 위치가 (y,x)이고, 지금까지 만난 수의 합이 sum일 때, 이 경로를 맨 아래줄까지 연장해서 얻을 수 있는 최대 합을 반환한다. <br>
 
 - 점화식
-    path1(y,x,sum) = max {  - path1(y+1, x, sum+triangle[y][x]) <br>
-                            - path1(y+1, x+1, sum+triangle[y][x]) }
+    path1(y,x,sum) = max { path1(y+1, x, sum+triangle[y][x]), path1(y+1, x+1, sum+triangle[y][x]) }
 <br><br>
 ```c++
 // 코드 8.8 삼각형 위의 최대 경로 문제를 푸는 메모이제이션 코드 (1)
@@ -574,8 +575,7 @@ int path1(int y, int x, int sum) {
     path2(y, x) = (y,x)에서 시작해서 맨 아래줄까지 내려가는 부분 경로의 최대 합을 반환한다. <br>
 
 - 점화식
-    path2(y, x) = triangle[y][x] + max {  - path2(y+1, x) <br>
-                                          - path2(y+1, x+1) }
+    path2(y, x) = triangle[y][x] + max { path2(y+1, x), path2(y+1, x+1) }
 
 ```c++
 // 코드 8.9 삼각형 위의 최대 경로 문제를 푸는 동적 계획법 알고리즘 (2)
