@@ -658,7 +658,7 @@ int main(void) {
 <br><br>
     
     <p align="center">
-        <img width="396" alt="스크린샷 2022-01-24 오후 6 27 10" src="https://user-images.githubusercontent.com/91893721/150756405-111ed6bc-2e77-4550-94f9-602700a1c7cc.png">
+        <img width="1440" alt="스크린샷 2022-01-24 오후 6 27 10" src="https://user-images.githubusercontent.com/91893721/150756405-111ed6bc-2e77-4550-94f9-602700a1c7cc.png">
 
 
 ### 시작 위치 고정하기
@@ -799,7 +799,7 @@ O(nlgn)
 ## 문제: 합친 LIS (문제 ID: JLIS, 난이도: 하)
     
 <p align="center">
-<img width="416" alt="스크린샷 2022-01-24 오후 6 15 44" src="https://user-images.githubusercontent.com/91893721/150754591-5edd3220-9bca-43a0-ae95-1338784b85ba.png">
+<img width="1440" alt="스크린샷 2022-01-24 오후 6 15 44" src="https://user-images.githubusercontent.com/91893721/150754591-5edd3220-9bca-43a0-ae95-1338784b85ba.png">
 
 
 
