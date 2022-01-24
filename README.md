@@ -1,4 +1,4 @@
-# 08. 동적 계획법
+# 08-1. 동적 계획법
 
 ## 다이나믹 프로그래밍(Dynamic Programming)이란 ?
 
@@ -267,6 +267,7 @@ int jump2(int y, int x) {
        이때 w의 pos+1 이후를 패턴 w'으로 하고, s의 pos+skip 이후를 문자열 s'로 해서 match(w', s')로 <br>
        재귀 호출했을 때 답이 하나라도 참이면 답은 참이 된다.
 
+### 와일드카드 완전 탐색
 ```c++
 // 코드 8.6 와일드카드 문제를 해결하는 완전 탐색 알고리즘
 #include <iostream>
@@ -293,7 +294,7 @@ bool match(const std::string& w, const std::string& s) {
 }
 ```
 
-
+### 중복되는 부분 문제
 ```c++
 // 코드 8.7 와일드카드 문제를 해결하는 동적 계획법 알고리즘
 // 시간 복잡도) O(n) = n^3
@@ -335,6 +336,7 @@ bool matchMemoized(int w, int x) {
 }
 ```
 
+### 다른 분해 방법 -> 시간 복잡도 O(n^2)
 ```c++
 // 코드 8.7' 와일드카드 문제를 해결하는 동적 계획법 알고리즘
 // 시간 복잡도) O(n) = n^2
@@ -436,7 +438,393 @@ int main(void) {
 //aa
 //aaa
 ```
+### 내 코드
+```c++
+// 내 생각) 시간 복잡도 O(n) = n^2
+// 느낀점) 처음에 if문이 복잡하더라도 기준을 잘 잡고 분류해서
+//       정리하는 연습을 하기
+// 아쉬운점) 재귀를 호출할 때마다 매번 문자열 객체를 생성해야된다.
+
+
+#include <iostream>
+#include <string>
+#include <memory.h>
+
+int cache[101][101];
+
+int match(const std::string& W, const std::string& s) {
+    // 메모이제이션 ( memoization )
+    int& ret = cache[W.size()][s.size()];
+    if (ret != -1) return ret;
+    
+    // base case
+    if ((W.size() != 0) && (s.size() != 0) && ((W[0] == s[0]) || (W[0] == '?')))
+        ret = match(W.substr(1), s.substr(1));
+    
+    else if (W.size() == 0)
+        ret = (s.size() == 0);
+    
+    else if (W[0] == '*') {
+        if (s.size() != 0)
+            ret = match(W.substr(1), s) || match(W, s.substr(1));
+        else
+            ret = match(W.substr(1), s);
+    }
+    
+    // 나머지 경우는 어떤 경우일까?
+    // (s.size() == 0) && (W[0] != '*')
+    // (s.size() != 0) && ((W[0] != s[0]) && (W[0] != '?'))
+    else
+        ret = 0;
+    
+    return ret;
+}
 
 
 
+int main(void) {
+    int C;
+    std::cin >> C;
+    
+    for (int i=0;i<C;i++) {
+        std::string W;
+        
+        std::cout << i+1 << "번 째 문자 : ";
+        std::cin >> W;
+        std::cout << "횟수 : ";
+        int n;
+        std::cin >> n;
+        for (int j=0;j<n;j++) {
+            std::string s;
+            std::cin >> s;
+            
+            for (int k=0;k<101;k++)
+                memset(cache+k, -1, 101);
+            
+            if (match(W, s) == 1)
+                std::cout << s << std::endl;
+            else
+                std::cout << "결과 없음" << std::endl;
+        }
+        
+    }
+    
+    return 0;
+}
+
+
+//100
+//he?p
+//3
+//help
+//heap
+//helpp
+//*p*
+//4
+//hp
+//help
+//papa
+//hello
+//*bb*
+//1
+//babbbc
+//1
+//******a
+//aaaaaaaaaab
+//??
+//3
+//a
+//aa
+//aaa
+
+```
+
+## 예제: 삼각형 위의 최대 경로(문제 ID: TRIANGLEPATH, 난이도: 하)
+
+### 무식하게 메모이제이션 적용하기
+- 함수 정의
+    path1(y, x, sum) = 현재 위치가 (y,x)이고, 지금까지 만난 수의 합이 sum일 때, 이 경로를 맨 아래줄까지 연장해서 얻을 수 있는 최대 합을 반환한다. <br>
+
+- 점화식
+    path1(y,x,sum) = max {  - path1(y+1, x, sum+triangle[y][x]) <br>
+                            - path1(y+1, x+1, sum+triangle[y][x]) }
+<br><br>
+```c++
+// 코드 8.8 삼각형 위의 최대 경로 문제를 푸는 메모이제이션 코드 (1)
+
+// MAX_NUMBER: 한 칸에 들어갈 숫자의 최대치
+int n, triangle[100][100];
+int cache[100][100][MAX_NUMBER*100+1];
+
+// (y,x) 위치까지 내려오기 전에 만난 숫자들의 합이 sum일 때
+// 맨 아래줄까지 내려가면서 얻을 수 있는 최대 경로를 반환한다.
+int path1(int y, int x, int sum) {
+    // 기저 사례: 맨 아래 줄까지 도달했을 경우
+    if (y == n-1) return sum + triangle[y][x];
+    // 메모이제이션
+    int& ret = cache[y][x][sum];
+    if (ret != -1) return ret;
+    sum += triangle[y][x];
+    return ret = std::max(path1(y+1, x+1, sum), path1(y+1, x, sum));
+}
+```
+
+### 입력 걸러내기
+- 함수 정의
+    path2(y, x) = (y,x)에서 시작해서 맨 아래줄까지 내려가는 부분 경로의 최대 합을 반환한다. <br>
+
+- 점화식
+    path2(y, x) = triangle[y][x] + max {  - path2(y+1, x) <br>
+                                          - path2(y+1, x+1) }
+
+```c++
+// 코드 8.9 삼각형 위의 최대 경로 문제를 푸는 동적 계획법 알고리즘 (2)
+// 시간 복잡도 O(n) = n^2
+
+int n, triangle[100][100];
+int cache2[100][100];
+
+// (y, x) 위치부터 맨 아래줄까지 내려가면서 얻을 수 있는 최대 경로의 합을 반환한다.
+int path2(int y, int x) {
+    // 기저 사례
+    if (y == n-1) return triangle[y][x];
+
+    // 메모이제이션
+    int& ret = cache2[y][x];
+    if (ret != -1) return ret;
+    return ret = std::max(path2(y+1, x), path2(y+1, x+1)) + triangle[y][x];
+}
+```
+
+## 예제: 최대 증가 부분 수열 (문제 ID: LIS, 난이도: 하)
+
+### 완전 탐색에서 시작하기
+```c++
+// 코드 8.10 최대 증가 부분 수열 문제를 해결하는 완전 탐색 알고리즘
+
+#include <vector>
+
+int lis(const std::vector<int>& A) {
+    // 기저 사례: A가 텅 비어 있을 때
+    if (A.empty()) return 0;
+    int ret = 0;
+    for (int i = 0; i < A.size(); ++i) {
+        std::vector<int> B;
+        for (int j = i+1; j < A.size(); ++j)
+            if (A[i] < A[j])
+                B.push_back(A[j]);
+        ret = std::max(ret, 1 + lis(B));
+    }
+    return ret;
+}
+```
+
+### 입력 손보기
+```c++
+// 코드 8.11 최대 증가 부분 수열 문제를 해결하는 동적 계획법 알고리즘(1)
+
+int n;
+int cache[100], S[100];
+
+// S[start]에서 시작하는 증가 부분 수열 중 최대 길이를 반환한다.
+int lis2(int start) {
+    int& ret = cache[start];
+    if (ret != -1) return ret;
+    // 항상 S[start]는 있기 때문에 길이는 최하 1
+    ret = 1;
+    for (int next = start+1; next < n; ++next)
+        if (A[start] < A[next])
+            ret = std::max(ret, lis2(next) + 1);
+    return ret;
+}
+
+// 시작 위치 고정하기
+int main(void) {
+    
+    int maxLen = 0;
+    for (int begin = 0; begin < n; ++begin)
+        maxLen = std::max(maxLen, lis2(begin));
+
+    return 0;
+}
+```
+
+- 문제점: lis2()를 호출할 때는 항상 증가 부분 수열의 시작 위치를 지정해 줘야 하므로, <br>
+        처음에 호출할 때 각 위치를 순회하면서 최대 값을 찾는 다음과 같은 형태의 코드를 작성해야된다.
+<br><br>
+
+### 시작 위치 고정하기
+```c++
+// 코드 8.12 최대 증가 부분 수열 문제를 해결하는 동적 계획법 알고리즘 (2)
+
+int n;
+int cache[101], S[100];
+
+// S[start]에서 시작하는 증가 부분 수열 중 최대 길이를 반환한다.
+int lis3(int start) {
+    int& ret = cache[start+1];
+    if (ret != -1) return ret;
+    // 항상 S[start]는 있기 때문에 길이는 최하 1
+    ret = 1;
+    for (int next = start+1; next < n; ++next)
+        if (start == -1 || S[start] < S[next])
+            ret = std::max(ret, lis3(next) + 1);
+    return ret;
+}
+```
+
+## 내 코드
+
+```c++
+#include <iostream>
+#include <vector>
+#include <memory.h>
+
+
+// 내 생각) 시간 복잡도 O(n) = n^2
+// help 의미 : 바로 앞의 index (만약, 앞이 없으면 -1)
+//
+// help == -1 : x번째부터 재귀 시작
+// help != -1 : 1. ls[help] >= ls[x]
+//                  -> 다음 index로 재귀 호출
+//              2. ls[help] < ls[x]
+//                  1) x번째를 포함하지 않는 경우
+//                  2) x번째를 포함시키는 경우
+
+std::vector<int> ls;
+int cache[100];
+int M = 0;
+
+int recursive(int x, int help) {
+    // base case
+    if (x == ls.size()) return 0;
+    
+    // memoization
+    int& ret = cache[x];
+    
+    if (help == -1) {
+        if (ret != -1)
+            return ret;
+        return ret = recursive(x+1, x) + 1;
+    }
+    
+    if (ls[help] >= ls[x])
+        return recursive(x+1, help);
+    
+    else if (ret != -1)
+        return ret;
+    
+    else {
+        int a = recursive(x+1, help);
+        ret = recursive(x+1, x) + 1;
+        return std::max<int>(a, ret);
+    }
+}
+
+int main(void) {
+    M = 0; ls.clear();
+    std::memset(cache, -1, 100);
+    
+    ls.push_back(2);
+    ls.push_back(1);
+    ls.push_back(5);
+    ls.push_back(2);
+    ls.push_back(4);
+    ls.push_back(7);
+    recursive(0, -1);
+    for (int i=0;i<100;i++) {
+        M = (cache[i] > M) ? cache[i] : M;
+    }
+    std::cout << "M : " << M << std::endl;
+    
+    M = 0; ls.clear();
+    std::memset(cache, -1, 100);
+    
+    ls.push_back(1);
+    ls.push_back(3);
+    ls.push_back(4);
+    ls.push_back(2);
+    ls.push_back(4);
+    recursive(0, -1);
+    for (int i=0;i<100;i++) {
+        M = (cache[i] > M) ? cache[i] : M;
+    }
+    std::cout << "M : " << M << std::endl;
+    
+    M = 0; ls.clear();
+    std::memset(cache, -1, 100);
+    
+    ls.push_back(2);
+    ls.push_back(1);
+    ls.push_back(5);
+    ls.push_back(2);
+    ls.push_back(4);
+    ls.push_back(7);
+    recursive(0, -1);
+    for (int i=0;i<100;i++) {
+        M = (cache[i] > M) ? cache[i] : M;
+    }
+    std::cout << "M : " << M << std::endl;
+    
+    M = 0; ls.clear();
+    std::memset(cache, -1, 100);
+    ls.push_back(1);
+    ls.push_back(1);
+    ls.push_back(1);
+    ls.push_back(1);
+    ls.push_back(1);
+    ls.push_back(1);
+    recursive(0, -1);
+    for (int i=0;i<100;i++) {
+        M = (cache[i] > M) ? cache[i] : M;
+    }
+    std::cout << "M : " << M << std::endl;
+    return 0;
+}
+```
+
+### 더 빠른 해법
+
+O(nlgn)
+<br><br>
+
+## 문제: 합친 LIS (문제 ID: JLIS, 난이도: 하)
+
+```c++
+// 코드 8.13 합친 LIS 문제를 해결하는 동적 계획법 알고리즘
+
+// 입력이 32비트 부호 있는 정수의 모든 값을 가질 수 있으므로
+// 인위적인 최소치는 64비트여야 한다.
+const long long NEGINF = numeric_limits<long long>::min();
+int n, m, A[100], B[100];
+int cache[101][101];
+
+// min(A[indexA], B[indexB]), max(A[indexA], B[indexB])로 시작하는
+// 합친 증가 부분 수열의 최대 길이를 반환한다.
+// 단 indexA == indexB == -1 혹은 A[indexA] != B[indexB]라고 가정한다.
+int jlis(int indexA, int indexB) {
+    // 메모이제이션
+    int& ret = cache[indexA+1][indexB+1];
+    if (ret != -1) return ret;
+
+    // A[indexA], B[indexB]가 이미 존재하므로 2개는 항상 있다.
+    ret = 2;
+    long long a = (indexA == -1 ? NEGINF : A[indexA]);
+    long long b = (indexB == -1 ? NEGINF : B[indexB]);
+    long long maxElement = std::max(a, b);
+    // 다음 원소를 찾는다.
+    for (int nextA = indexA + 1; nextA < n; ++nextA)
+        if (maxElement < A[nextA])
+            ret = std::max(ret, jlis(nextA, indexB) + 1);
+    for (int nextB = nextB + 1; nextB < m; ++nextB)
+        if (maxElement < B[nextB])
+            ret = std::max(ret, jlis(indexA, nextB) + 1);
+    return ret;
+}
+```
+
+
+
+
+## 
 ##
