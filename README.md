@@ -253,4 +253,190 @@ int jump2(int y, int x) {
 }
 ```
 
+## 8.2 문제: 와일드카드 (문제 ID: WILDCARD, 난이도: 중)
+
+1. s[pos]와 w[pos]가 대응되지 않는다.
+     - 볼 것도 없이 대응 실패라는 것을 알 수 있다.
+2. w 끝에 도달한다.
+     - 패턴에 *이 하나도 없는 경우이다. 이 경우에 패턴과 문자열의 길이가 정확히 같아야만 패턴과 문자열이 대응된다고 할 수 있다.
+3. s 끝에 도달한다.
+     - 패턴은 남았지만 문자열이 이미 끝난 경우이다. 당연히 대응 실패라고 생각할 수 있지만, <br>
+       남은 패턴이 전부 *로 구성되어 있다면 사실 두 문자열은 대응될 수 있다. 이 경우를 제외하고는 답은 항상 거짓이다.
+4. w[pos]가 *인 경우
+     - *가 몇 글자에 대응될지 모르기 때문에, 0글자부터 남은 문자열의 길이까지를 순회하며 모든 가능성을 검사한다. <br>
+       이때 w의 pos+1 이후를 패턴 w'으로 하고, s의 pos+skip 이후를 문자열 s'로 해서 match(w', s')로 <br>
+       재귀 호출했을 때 답이 하나라도 참이면 답은 참이 된다.
+
+```c++
+// 코드 8.6 와일드카드 문제를 해결하는 완전 탐색 알고리즘
+#include <iostream>
+#include <string>
+
+// 와일드카드 패턴 w가 문자열 s에 대응되는지 여부를 반환한다.
+bool match(const std::string& w, const std::string& s) {
+    // w[pos]와 s[pos]를 맞춰나간다.
+    int pos = 0;
+    while (pos < s.size() && pos < w.size() && (w[pos] == '?' || w[pos] == s[pos]))
+        ++pos;
+    
+    // 더 이상 대응할 수 없으면 왜 while문이 끝났는지 확인한다.
+    // 2. 패턴 끝에 도달해서 끝난 경우 : 문자열도 끝났어야 대응됨
+    if (pos == w.size())
+        return pos == s.size();
+    // 4. *를 만나서 끝난 경우: *에 몇 글자를 대응해야 할지 재귀 호출하면서 확인한다.
+    if (w[pos] == '*')
+        for (int skip = 0; pos+skip <= s.size(); ++skip)
+            if (match(w.substr(pos+1), s.substr(pos+skip)))
+                return true;
+    // 이 외이 경우에는 모두 대응되지 않는다.
+    return false;
+}
+```
+
+
+```c++
+// 코드 8.7 와일드카드 문제를 해결하는 동적 계획법 알고리즘
+// 시간 복잡도) O(n) = n^3
+
+#include <iostream>
+#include <string>
+
+// -1은 아직 답이 계산되지 않았음을 의미한다.
+// 1은 해당 입력들이 서로 대응됨을 의미한다.
+// 0은 해당 입력들이 서로 대응되지 않음을 의미한다.
+int cache[101][101];
+
+// 패턴과 문자열
+std::string W, S;
+
+// 와일드카드 패턴 W[w..]가 문자열 S[s..]에 대응되는지 여부를 반환한다.
+bool matchMemoized(int w, int x) {
+    // 메모이제이션
+    int& ret = cache[w][s];
+    if (ret != -1) return ret;
+    // W[w]와 S[s]를 맞춰나간다.
+    while (s < S.size() && w < W.size() && (W[w] == '?' || W[w] == S[s])) {
+        ++w;
+        ++s;
+    }
+
+    // 더 이상 대응할 수 없으면 왜 while문이 끝났는지 확인한다.
+    // 2. 패턴 끝에 도달해서 끝난 경우 : 문자열도 끝났어야 참
+    if (w == W.size()) return ret = (s == S.size());
+
+    // 4. *를 만나서 끝난 경우: *에 몇 글자를 대응해야 할지 재귀 호출하면서 확인한다.
+    if (W[w] == '*')
+        for (int skip = 0; skip+s <= S.size(); ++skip)
+            if (match(W.substr(w+1), s.substr(s+skip)))
+                return ret = 1;
+                
+    // 3. 이 외이 경우에는 모두 대응되지 않는다.
+    return ret = 0;
+}
+```
+
+```c++
+// 코드 8.7' 와일드카드 문제를 해결하는 동적 계획법 알고리즘
+// 시간 복잡도) O(n) = n^2
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <memory.h>
+
+// -1은 아직 답이 계산되지 않았음을 의미한다.
+// 1은 해당 입력들이 서로 대응됨을 의미한다.
+// 0은 해당 입력들이 서로 대응되지 않음을 의미한다.
+int cache[101][101];
+
+// 패턴과 문자열
+std::string W, S;
+
+// 와일드카드 패턴 W[w..]가 문자열 S[s..]에 대응되는지 여부를 반환한다.
+bool matchMemoized(int w, int s) {
+    // 메모이제이션
+    int& ret = cache[w][s];
+    if (ret != -1) return ret;
+    // 패턴과 문자열의 첫 한 글자씩을 떼고 이들이 서로 대응되는지를 재귀 호출로 확인
+    if (s < S.size() && w < W.size() && (W[w] == '?' || W[w] == S[s]))
+        return ret = matchMemoized(w+1, s+1);
+
+    // 더 이상 대응할 수 없으면 왜 while문이 끝났는지 확인한다.
+    // 2. 패턴 끝에 도달해서 끝난 경우 : 문자열도 끝났어야 참
+    if (w == W.size()) return ret = (s == S.size());
+
+    // 4. *를 만나서 끝난 경우: *에 몇 글자를 대응해야 할지 재귀 호출하면서 확인한다.
+    if (W[w] == '*')
+        if (matchMemoized(w+1, s) || (s < S.size() && matchMemoized(w, s+1)))
+            return ret = 1;
+            
+    // 3. 이 외이 경우에는 모두 대응되지 않는다.
+    return ret = 0;
+}
+
+int main(void) {
+    int C;
+    std::cin >> C;
+    
+    for (int i=0;i<C;i++) {
+        std::vector<std::string> p;
+        
+        std::cout << i+1 << "번 째 문자 : ";
+        std::cin >> W;
+        std::cout << "횟수 : ";
+        int n;
+        std::cin >> n;
+        for (int j=0;j<n;j++) {
+            std::cin >> S;
+            
+            for (int k=0;k<W.size()+1;k++)
+                memset(cache+k, -1, S.size()+1);
+            
+            if (matchMemoized(0, 0))
+                p.push_back(S);
+//            else
+//                std::cout << "결과 없음" << std::endl;
+        }
+        
+        std::cout << "-----------------" << std::endl;
+        // 알파벳 순서대로 출력
+        std::sort(p.begin(), p.end());
+        for (int j=0;j<p.size();j++) {
+            std::cout << p[j] << std::endl;
+        }
+        
+    }
+    
+    return 0;
+}
+
+
+//100
+//he?p
+//3
+//help
+//heap
+//helpp
+//*p*
+//4
+//hp
+//help
+//papa
+//hello
+//*bb*
+//1
+//babbbc
+//1
+//******a
+//aaaaaaaaaab
+//??
+//3
+//a
+//aa
+//aaa
+```
+
+
+
 ##
