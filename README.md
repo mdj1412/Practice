@@ -123,7 +123,7 @@ memset()으로 정수 배열에 0 혹은 -1을 채울 수 있는 이유느 각 �
 DP 문제를 푸는 방법은 탑다운(Top-Down)과 바텀업(Bottom-Up)이 있다. <br>
 두 방법 모두 큰 문제를 여러 개의 부분 문제들로 나누어 풀지만, 차이점이 있다. <br>
 
-우리 책에서는 메모이제이션을 이용하는 바텀업 방식을 많이 사용하였다. <br>
+우리 책에서는 메모이제이션을 이용하는 탑다운 방식을 많이 사용하였다. <br>
 하지만 DP의 전형적인 형태는 바텀업(Bottom-Up) 방식이라고 한다. <br>
 
 - 탑다운(Top-Down)
@@ -295,6 +295,10 @@ bool match(const std::string& w, const std::string& s) {
     return false;
 }
 ```
+
+<p align="center">
+<img width="1440" alt="스크린샷 2022-01-24 오후 6 02 34" src="https://user-images.githubusercontent.com/91893721/150752622-02f685e8-415c-43c3-b49f-70ffb2ddfe22.png">
+
 
 ### 중복되는 부분 문제
 ```c++
@@ -652,6 +656,10 @@ int main(void) {
 - 문제점: lis2()를 호출할 때는 항상 증가 부분 수열의 시작 위치를 지정해 줘야 하므로, <br>
         처음에 호출할 때 각 위치를 순회하면서 최대 값을 찾는 다음과 같은 형태의 코드를 작성해야된다.
 <br><br>
+    
+    <p align="center">
+        <img width="396" alt="스크린샷 2022-01-24 오후 6 27 10" src="https://user-images.githubusercontent.com/91893721/150756405-111ed6bc-2e77-4550-94f9-602700a1c7cc.png">
+
 
 ### 시작 위치 고정하기
 ```c++
@@ -789,6 +797,11 @@ O(nlgn)
 <br><br>
 
 ## 문제: 합친 LIS (문제 ID: JLIS, 난이도: 하)
+    
+<p align="center">
+<img width="416" alt="스크린샷 2022-01-24 오후 6 15 44" src="https://user-images.githubusercontent.com/91893721/150754591-5edd3220-9bca-43a0-ae95-1338784b85ba.png">
+
+
 
 ```c++
 // 코드 8.13 합친 LIS 문제를 해결하는 동적 계획법 알고리즘
