@@ -845,6 +845,13 @@ int jlis(int indexA, int indexB) {
     숫자가 등차 수열을 이룰 때                     147, 8642           5
     이 외의 모든 경우                          17912, 331          10
 
+
+### 점화식
+<img width="400" alt="스크린샷 2022-01-26 오후 5 28 17" src="https://user-images.githubusercontent.com/91893721/151128791-d222f8c1-4a80-4ad8-9a3e-ce1181440007.png">
+
+
+    
+    
 ```c++
 // 코드 8.14 원주율 외우기 문제를 해결하는 동적 계획법 알고리즘
 
@@ -895,5 +902,8 @@ int memorize(int begin) {
     return ret;
 }
 ```
+    
+<img width="600" alt="스크린샷 2022-01-26 오후 5 28 03" src="https://user-images.githubusercontent.com/91893721/151128899-0b1e42e7-e240-4fb0-a84a-373b34a16887.png">
+
 ## 
 ##
