@@ -796,7 +796,7 @@ int main(void) {
 O(nlgn)
 <br><br>
 
-## 문제: 합친 LIS (문제 ID: JLIS, 난이도: 하)
+## 8.5 문제: 합친 LIS (문제 ID: JLIS, 난이도: 하)
     
 <p align="center">
 <img width="1440" alt="스크린샷 2022-01-24 오후 6 15 44" src="https://user-images.githubusercontent.com/91893721/150754591-5edd3220-9bca-43a0-ae95-1338784b85ba.png">
@@ -835,9 +835,65 @@ int jlis(int indexA, int indexB) {
     return ret;
 }
 ```
+<br><br>
+## 8.7 문제: 원주율 외우기(문제 ID: PI, 난이도: 하)
+    
+        경우                              예               난이도
+    모든 숫자가 같을 때                     333, 5555           1
+    숫자가 1씩 단조 증가하건 단조 감소할 때         23456, 3210         2
+    두 개의 숫자가 번갈아가며 나타날 때            323, 54545          4
+    숫자가 등차 수열을 이룰 때                     147, 8642           5
+    이 외의 모든 경우                          17912, 331          10
 
+```c++
+// 코드 8.14 원주율 외우기 문제를 해결하는 동적 계획법 알고리즘
 
+#include <string>
 
+const int INF = 987654321;
+std::string N;
 
+// N[a..b] 구간의 난이도를 반환한다.
+int classify(int a, int b) {
+    // 숫자 조각을 가져온다.
+    std::string M = N.substr(a, b-a+1);
+    // 첫 글자만으로 이루어진 문자열과 같으면 난이도는 1
+    if (M == std::string(M.size(), M[0])) return 1;
+    // 등차수열인지 검사한다.
+    bool progressive = true;
+    for (int i = 0; i < M.size()-1; ++i)
+        if (M[i+1] - M[i] != M[1] - M[0])
+            progressive = false;
+    // 등차수열이고 공차가 1 혹은 -1이면 난이도는 2
+    if (progressive && abs(M[1] - M[0]) == 1)
+        return 2;
+    // 두 수가 번갈아 등장하는지 확인한다.
+    bool alternating = true;
+    for (int i = 0; i < M.size(); ++i)
+        if (M[i] != M[i%2])
+            alternating = false;
+    // 두 수가 번갈아 등장하면 난이도는 4
+    if (alternating) return 4;
+    // 공차가 1 아닌 등차수열의 난이도는 5
+    if (progressive) return 5;
+    // 이 외는 모두 난이도 10
+    return 10;
+}
+
+int cache[10002];
+// 수열 N[begin..]를 외우는 방법 중 난이도의 최소 합을 출력한다.
+int memorize(int begin) {
+    // 기저 사례: 수열의 끝에 도달했을 경우
+    if (begin == N.size()) return 0;
+    // 메모이제이션
+    int& ret = cache[begin];
+    if (ret != -1) return ret;
+    ret = INF;
+    for (int L = 3; L <= 5; ++L)
+        if (begin + L <= N.size())
+            ret = std::min(ret, memorize(begin + L) + classify(begin, begin + L - 1));
+    return ret;
+}
+```
 ## 
 ##
