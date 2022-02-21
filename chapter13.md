@@ -5,7 +5,10 @@
 
 <br><br><br><br>
 
-## 13.2 이분법
+## 13.2 이분법 ( bisection method )
+
+이분법은 주어진 범위 [lo, hi] 내에서 어떤 함수 f(x)의 값이 0이 되는 지점을 수치적으로 찾아내는 기법이다. <br>
+꼭 단조 
 
 <p align="center">
 <img width="257" alt="스크린샷 2022-02-21 오후 2 59 50" src="https://user-images.githubusercontent.com/91893721/154897940-df024c3f-32d7-4bd4-a690-025e5dbc1df4.png">
